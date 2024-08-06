@@ -1,3 +1,14 @@
+"""
+NICOLLE RUIZ QUINTERO
+8974036
+
+DECIDI USAR EL REDONDEO HALF UP PORQUE VI QUE A UNOS COMPAÑEROS ALGUNAS CIFRAS NO LES DABA Y YO PENSE QUE ERA EL REDONDEO DE PYTHON QUE NO
+FUNCIONABA BIEN ENTONCES INVESTIGUE Y ENCONTRE EN UN FORO ESTE TIPO DE REDONDEO ADJUNTO LINK:
+  https://es.stackoverflow.com/questions/317012/por-qué-en-python-3-round-redondea-3-5-a-4-pero-2-5-a-2
+
+"""
+
+
 import math
 from decimal import Decimal, ROUND_HALF_UP
 from collections import Counter
