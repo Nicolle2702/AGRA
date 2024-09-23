@@ -4,10 +4,10 @@
 using namespace std;
 
 void dfsAux2(int ini, int fin, int& suma, vector<vector<int>>& G, vector<bool>& vis) {
-    vis[ini] = true;  // Marcamos el nodo actual como visitado
+    vis[ini] = true;  
 
     if (ini==fin) {
-        suma++;  // Incrementar el contador de caminos
+        suma++;  
     }
 
     for (int w = 0; w < G[ini].size(); ++w) {
@@ -25,7 +25,7 @@ int dfs(int ini, int fin, vector<vector<int>>& adj) {
     vector<bool> vis(adj.size(), false);
     dfsAux2(ini, fin, suma, adj, vis);
 
-    return suma;  // Devolver el número total de caminos
+    return suma;  
 }
 
 
