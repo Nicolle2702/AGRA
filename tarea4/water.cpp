@@ -1,79 +1,125 @@
 #include <vector>
-#include <stack>
+#include <list>
 #include <iostream>
-#include <queue>
-#include <set>
 
 using namespace std;
 
-vector<int> topoSortKahn(vector<vector<int>>& G) {
-    int n = G.size();
-    vector<int> inc(n, 0), topo;
-    queue<int> q;
+int n;
+vector<vector<int> > adj(500, vector<int>());
+vector<vector<int> > adjT(500, vector<int>());
+bool visitados[500];
+list<int> ord;
+int sccInd[500];
+int numScc;
+vector<vector<int>> sccNodos;
 
-    // Contar el número de entradas para cada nodo
-    for (int u = 0; u < n; u++) {
-        for (int j = 0; j < G[u].size(); j++) {
-            int v = G[u][j];
-            inc[v]++;
-            cout<<inc[v]<<"incidencia en posi: "<<v<<endl;
+void kosarajuAux(int);
+void asignar(int, int);
+
+void kosaraju(){
+    int i, num = 0;
+
+    for(i = 0; i < n; i++)
+        visitados[i] = false;
+
+    for(i = 0; i < n; i++)
+        if(!visitados[i])
+        kosarajuAux(i);
+
+    for(i = 0; i < n; i++)
+        sccInd[i] = -1;
+
+    for(list<int>::iterator it = ord.begin(); it != ord.end(); it++){
+        if(sccInd[*it] == -1){
+            numScc++;
+            sccNodos.push_back(vector<int>());
+            asignar(*it, num++);
         }
     }
+}
 
-    // Agregar a la cola los nodos con 0 entradas
-    for (int u = 0; u < n; u++) {
-        if (inc[u] == 0) {
-            q.push(u);
-        }
+void kosarajuAux(int v){
+    visitados[v] = true;
+
+    for(int i = 0; i < adj[v].size(); i++)
+        if(!visitados[adj[v][i]])
+            kosarajuAux(adj[v][i]);
+
+    ord.push_front(v);
+}
+
+void asignar(int u, int num){
+    sccInd[u] = num;
+    sccNodos[sccNodos.size() -1].push_back(u);
+    for(int i = 0; i < adjT[u].size(); i++){
+        if(sccInd[adjT[u][i]] == -1)
+            asignar(adjT[u][i], num);
     }
-
-    // Procesar los nodos
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
-        topo.push_back(u);
-        cout<<q.front()<<endl;
-
-        for (int j = 0; j < G[u].size(); j++) {
-            int v = G[u][j];
-            inc[v]--;
-            if (inc[v] == 0) {
-                q.push(v);
-            }
-        }
-    }
-
-    // Verificar si se encontró un ordenamiento topológico válido
-    if (topo.size() != n) {
-        topo.clear();  // Si hay un ciclo, limpiar el vector para devolver un vector vacío
-    }
-
-    return topo;
 }
 
 
-int main(){
-    int n;
-    int m;
-    cin>>n>>m;
-    while(n,m){
-        vector<int> ans;
-        vector<vector<int>> adj(n);
-        for(int i=0; i<m;++i){
-            int casa1;
-            int casa2;
-            cin>>casa1>>casa2;
-            adj[casa1].push_back(casa2);
-            
-
+void dfsAux2(int u, vector<vector<int>> &G, vector<bool> &vis){
+    int w, i;
+    vis[u] = true;
+    printf("%d\n", u);
+    for(i = 0; i < G[u].size(); ++i){
+        w = G[u][i];
+        cout<<w<<" :ESTOY RECORRIENDO EN"<<endl;
+        if(!vis[w])
+            dfsAux2(w, G, vis);
         }
-        ans=topoSortKahn(adj);
+    }
 
-        for (vector<int>::iterator it = ans.begin(); it != ans.end(); ++it) {
-            cout << *it << " ";
+
+int main(){
+    int m, i, u, v,contConex=0;
+
+    cin >> n >> m;
+    for(i = 0; i < m; i++){
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adjT[v].push_back(u);
+    }
+
+    kosaraju();
+    cout<<sccNodos.size();
+    for(i = 0; i < m; i++){
+        cout << sccInd[i] << " ";
+    }
+    vector<vector<int>> grafoNuevo(sccNodos.size());
+    for (int u=0; u<m; ++u) {
+        for (int k=0; k<adj[u].size(); ++k) {
+            int v= adj[u][k];  
+            
+            int sccU=sccInd[u];  
+            int sccV=sccInd[v];  
+            
+            if (sccU!=sccV) {
+                cout<<"Hay conexion entre "<<v<<"Y "<<u<<endl;
+                grafoNuevo[sccU].push_back(sccV);  
+            }
+        }
+    }
+    for (int j= 0; j<sccNodos.size(); j++) {
+        cout<<"SCC "<<j<<": ";
+        for (vector<int>::iterator it= sccNodos[j].begin(); it!=sccNodos[j].end(); ++it) {
+            cout<<*it<<" ";
         }
         cout<<endl;
-
     }
+    
+
+    vector<bool> vis(grafoNuevo.size(), false);
+    dfsAux2(sccInd[0], grafoNuevo, vis);
+    for(int i=0; i< vis.size(); ++i){
+        if(vis[i]==false){
+            contConex+=1;
+        }
+    }
+
+    cout<<"CANTIDAD MINIMA DE CONEX "<<contConex<<endl;
+
+    cout << endl;
+    
     return 0;
 }
